@@ -1,0 +1,17 @@
+========================================
+ 📊 WEB SERVER LOG ANALYSIS REPORT
+========================================
+
+📍 Top 5 Requesting IP Addresses:
+   - 192.168.1.15    : 142 requests
+   - 10.0.0.42       : 89 requests
+
+🔗 Top 5 Requested URLs:
+   - /index.html                    : 210 times
+   - /api/v1/users                  : 95 times
+
+🚦 HTTP Status Codes Distribution:
+   - HTTP 200 : 405 (✅ Success)
+   - HTTP 404 : 23 (❌ Error)
+   - HTTP 500 : 2 (❌ Error)
+========================================
