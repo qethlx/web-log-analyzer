@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import re
+import json
 from collections import Counter
 from typing import Dict, Any, Optional
 
@@ -51,16 +52,32 @@ def print_report(stats: Dict[str, Counter], limit: int = 5) -> None:
         
     print("\n🚦 HTTP Status Codes Distribution:")
     for status, count in stats['statuses'].most_common():
-        # Simple logic for categorization (200s are success, 400/500s are errors)
         status_type = "✅ (Success)" if status.startswith('2') else "❌ (Error)" if status.startswith(('4', '5')) else "ℹ️ (Info/Redirect)"
         print(f"   - HTTP {status} : {count} ({status_type})")
     
     print("\n" + "="*40 + "\n")
 
+def export_to_json(stats: Dict[str, Counter], output_file: str) -> None:
+    """Exports the parsed statistics to a JSON file, ordered by frequency."""
+    # Convert Counters to standard dicts ordered by frequency for JSON
+    serializable_stats = {
+        'ips': dict(stats['ips'].most_common()),
+        'urls': dict(stats['urls'].most_common()),
+        'statuses': dict(stats['statuses'].most_common())
+    }
+    
+    try:
+        with open(output_file, 'w', encoding='utf-8') as json_file:
+            json.dump(serializable_stats, json_file, indent=4)
+        print(f"💾 Results successfully exported to JSON: {output_file}\n")
+    except Exception as e:
+        print(f"❌ Error exporting to JSON: {e}\n")
+
 def main():
     parser = argparse.ArgumentParser(description="A simple and fast web log analysis tool.")
     parser.add_argument("logfile", help="Path to the log file to be analyzed (e.g., access.log)")
     parser.add_argument("-n", "--number", type=int, default=5, help="Number of top records to display (default: 5)")
+    parser.add_argument("-j", "--json", type=str, help="Export results to a JSON file (e.g., report.json)", default=None)
     
     args = parser.parse_args()
     
@@ -69,6 +86,9 @@ def main():
     
     if stats:
         print_report(stats, limit=args.number)
+        
+        if args.json:
+            export_to_json(stats, args.json)
 
 if __name__ == "__main__":
     main()
